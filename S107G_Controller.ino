@@ -1,5 +1,6 @@
 /*
-   Syma S107G RC helicopter Arduino controller (2-channel, 32-bit version)
+   Syma S107G RC helicopter Arduino controller
+   2-channel version (both 24-bit and 32-bit)
 
    Emulates the remote control of the S107G with commands passed through
    the serial port, using an array of infrarred LEDs attached to pin 3.
@@ -12,6 +13,8 @@
    * http://www.jimhung.co.uk/?p=1241
    * http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt
    * http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/
+   For the 3-channel model refer to:
+   * http://abarry.org/s107g-helicopter-control-via-arduino/
 */
 
 #define LED 3
@@ -56,14 +59,14 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
   byte dataPointer = 0, maskPointer = 8;
   byte data[4];
 
-  data[0] = yaw;
+  data[0] = byte(yaw + (int(trim_) - 63) / 3); // Adjusts yaw +/-20 to control trim
   data[1] = pitch;
   data[2] = throttle + channel;
-  data[3] = trim_;
+  data[3] = trim_;  // The S107G model ignores the trim byte
 
   sendHeader();
 
-  // Send 32-bit command (replace 4 with a 3 for 24-bit version but no trim logic)
+  // Send 32-bit command (replace 4 with a 3 for 24-bit version)
   while (dataPointer < 4) {
     sendPulse(312);
     if(data[dataPointer] & mask[--maskPointer]) {
