@@ -24,11 +24,11 @@ void setup() {
 
   Serial.begin(9600);
 
-  inputBuffer[0] = byte(0);   // channel (0 for A OR 128 for B)
-  inputBuffer[1] = byte(63);  // yaw (0 to 127)
-  inputBuffer[2] = byte(63);  // pitch (0 to 127)
-  inputBuffer[3] = byte(0);   // throttle (0 to 127)
-  inputBuffer[4] = byte(63);  // trim (0 to 127)
+  inputBuffer[0] = 0;   // channel (0 for A OR 128 for B)
+  inputBuffer[1] = 63;  // yaw (0 to 127)
+  inputBuffer[2] = 63;  // pitch (0 to 127)
+  inputBuffer[3] = 0;   // throttle (0 to 127)
+  inputBuffer[4] = 63;  // trim (0 to 127)
 }
 
 void sendPulse(long us) {
@@ -48,7 +48,7 @@ void sendHeader() {
 
 void sendFooter() {
   sendPulse(312);
-  delayMicroseconds(2001);
+  delayMicroseconds(2001);  // >2000ms according to specification
 }
 
 void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte trim_) {
@@ -63,7 +63,7 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
 
   sendHeader();
 
-  // Send 32-bit command
+  // Send 32-bit command (replace 4 with a 3 for 24-bit version but no trim logic)
   while (dataPointer < 4) {
     sendPulse(312);
     if(data[dataPointer] & mask[--maskPointer]) {
@@ -82,7 +82,7 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
 
 void loop() {
   static unsigned long millisLast = millis();
-  int interval;
+  unsigned long interval;
 
   if (inputBuffer[3] > 0) {
     // Send command to helicopter
@@ -106,9 +106,9 @@ void loop() {
 
   // Wait before sending next command
   if (!inputBuffer[0]) {
-    interval = 120;  // Channel A
+    interval = 120;  // channel A
   } else {
-    interval = 180;  // Channel B
+    interval = 180;  // channel B
   }
   while (millis() < millisLast + interval);
   millisLast = millis();
@@ -118,15 +118,15 @@ void serialEvent() {
   while (Serial.available()) {
     String str = Serial.readString();
     if (str.startsWith("c:")){
-      inputBuffer[0] = byte(str.substring(2).toInt());
+      inputBuffer[0] = str.substring(2).toInt();
     } else if (str.startsWith("y:")) {
-      inputBuffer[1] = byte(str.substring(2).toInt());
+      inputBuffer[1] = str.substring(2).toInt();
     } else if (str.startsWith("p:")) {
-      inputBuffer[2] = byte(str.substring(2).toInt());
+      inputBuffer[2] = str.substring(2).toInt();
     } else if (str.startsWith("t:")) {
-      inputBuffer[3] = byte(str.substring(2).toInt());
+      inputBuffer[3] = str.substring(2).toInt();
     } else if (str.startsWith("r:")) {
-      inputBuffer[4] = byte(str.substring(2).toInt());
+      inputBuffer[4] = str.substring(2).toInt();
     }
   }
 }
