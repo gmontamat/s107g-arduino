@@ -16,19 +16,19 @@ SymaLib Library Example v0.1 by Jim Hung (www.jimhung.com)
 
 #include <SymaLib.h>
 
-#define IRpin_PIN      PIND
-#define IRpin          2
+#define IRpin_PIN   PIND
+#define IRpin       2
 
-#define MAXPULSE 2000
-#define NUMPULSES 50
+#define MAXPULSE    2000
+#define NUMPULSES   50
 
-#define RESOLUTION 20
-#define FUZZINESS 30
+#define RESOLUTION  20
+#define FUZZINESS   30
 
 uint16_t pulses[NUMPULSES][2];  // pair is high and low pulse
-uint8_t currentpulse = 0; // index for pulses we're storing
+uint8_t currentpulse = 0;       // index for pulses we're storing
 
-SymaLib protocolparser; // declare our SymaLib object
+SymaLib protocolparser;         // declare our SymaLib object
 
 void setup(void) {
 
@@ -42,20 +42,16 @@ void loop(void) {
   String ctrldata = "";
 
   // Listen for IR signals and populate the array of pulse lengths
-
   numberpulses = listenForIR();
 
   // Give the SymaLib object the pulse array to parse. If it's a valid Syma107
   // control packet, SymaLib returns boolean True.
-
   boolean result = protocolparser.setPulseListParse(pulses, numberpulses, RESOLUTION, FUZZINESS);
 
   if (result) {
-
     // Read the controller values and do whatever you need to with them.
 
-      // This example prints out the integer values for each control:
-
+    // This example prints out the integer values for each control:
     Serial.print(" Yaw: ");
     Serial.print(protocolparser.getYawDec());
     Serial.print("\tPitch: ");
@@ -68,10 +64,8 @@ void loop(void) {
     Serial.print(protocolparser.getTrimDec());
     Serial.print("\n");
 
-      // This example prints out the binary values for the 32-bit control packet:
-
+    // This example prints out the binary values for the 32-bit control packet:
     Serial.println(protocolparser.getCtrlPacketBin());
-
   }
   delay(100);
 }
@@ -95,7 +89,7 @@ int listenForIR(void) {
 
     pulses[currentpulse][0] = highpulse;
 
-    while (! (IRpin_PIN & _BV(IRpin))) {
+    while (!(IRpin_PIN & _BV(IRpin))) {
 
        lowpulse++;
        delayMicroseconds(RESOLUTION);
