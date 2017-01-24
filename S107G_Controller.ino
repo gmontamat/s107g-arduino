@@ -59,7 +59,7 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
   byte dataPointer = 0, maskPointer = 8;
   byte data[4];
 
-  data[0] = byte(yaw + (int(trim_) - 63) / 3); // Adjusts yaw +/-20 to control trim
+  data[0] = byte(yaw + (int(trim_) - 63) / 3); // trim_ adjusts yaw +/-20
   data[1] = pitch;
   data[2] = throttle + channel;
   data[3] = trim_;  // The S107G model ignores the trim byte
@@ -81,6 +81,18 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
   }
 
   sendFooter();
+
+  // Print command data in serial monitor
+  Serial.print(" Channel = ");
+  Serial.print(channel, DEC);
+  Serial.print("\tYaw = ");
+  Serial.print(data[0], DEC);
+  Serial.print("\tPitch = ");
+  Serial.print(data[1], DEC);
+  Serial.print("\tThrottle = ");
+  Serial.print(throttle, DEC);
+  Serial.print("\tTrim = ");
+  Serial.println(data[3], DEC);
 }
 
 void loop() {
@@ -94,18 +106,6 @@ void loop() {
       inputBuffer[3], inputBuffer[4]
     );
   }
-
-  // Print command data in serial monitor
-  Serial.print(" Channel = ");
-  Serial.print(inputBuffer[0], DEC);
-  Serial.print("\tYaw = ");
-  Serial.print(inputBuffer[1], DEC);
-  Serial.print("\tPitch = ");
-  Serial.print(inputBuffer[2], DEC);
-  Serial.print("\tThrottle = ");
-  Serial.print(inputBuffer[3], DEC);
-  Serial.print("\tTrim = ");
-  Serial.println(inputBuffer[4], DEC);
 
   // Wait before sending next command
   if (!inputBuffer[0]) {
