@@ -8,11 +8,17 @@
    The circuit:
    * Two/three 940nm IR LEDs and a resistor (see http://led.linear1.org/led.wiz)
 
-   Based on:
+   Based on (credit to these people for reverse engineering the controller):
+   * https://github.com/vivin/syma
    * http://www.jimhung.co.uk/?p=901
    * http://www.jimhung.co.uk/?p=1241
-   * http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt
    * http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/
+   * https://sites.google.com/site/spirixcode/code/kodek.txt?attredirects=0
+   * https://learn.adafruit.com/ir-sensor/making-an-intervalometer
+
+   IR transmission protocol:
+   * http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt
+
    For the 3-channel model refer to:
    * http://abarry.org/s107g-helicopter-control-via-arduino/
 */
@@ -22,9 +28,10 @@
 #define HEADER_LOW_US   1998
 #define FOOTER_HIGH_US  312
 #define FOOTER_LOW_US   2001  // >2000us according to specification
-#define CONTROL_HIGH_US 312
-#define CONTROL_1_US    700
-#define CONTROL_0_US    300
+#define BIT_HIGH_US     312
+#define BIT_LOW_1_US    700
+#define BIT_LOW_0_US    300
+#define PULSE_PERIOD_US 26
 
 byte inputBuffer[5];
 
@@ -42,13 +49,16 @@ void setup() {
 }
 
 void sendPulse(long us) {
-  /* Sends 38Khz pulse when using a 16Mhz IC */
-  for (int i = 0; i < (us / 26) - 1; i++) {
-    digitalWrite(LED, HIGH);
+  /* Sends 38KHz pulse to LED pin for 'us' microseconds */
+  cli();
+  while (us > 0) {
+    digitalWrite(LED, HIGH);  // 3 microseconds approximately
     delayMicroseconds(10);
-    digitalWrite(LED, LOW);
+    digitalWrite(LED, LOW);   // 3 microseconds approximately
     delayMicroseconds(10);
+    us -= PULSE_PERIOD_US;    // 26 microseconds in total
   }
+  sei();
 }
 
 void sendHeader() {
@@ -76,11 +86,11 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
 
   // Send 32-bit command (replace 4 with a 3 for 24-bit version)
   while (dataPointer < 4) {
-    sendPulse(CONTROL_HIGH_US);
+    sendPulse(BIT_HIGH_US);
     if(data[dataPointer] & mask[--maskPointer]) {
-      delayMicroseconds(CONTROL_1_US); // 1
+      delayMicroseconds(BIT_LOW_1_US); // 1
     } else {
-      delayMicroseconds(CONTROL_0_US); // 0
+      delayMicroseconds(BIT_LOW_0_US); // 0
     }
     if (!maskPointer) {
       maskPointer = 8;
