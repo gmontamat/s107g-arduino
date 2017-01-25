@@ -18,6 +18,13 @@
 */
 
 #define LED 3
+#define HEADER_HIGH_US  2002
+#define HEADER_LOW_US   1998
+#define FOOTER_HIGH_US  312
+#define FOOTER_LOW_US   2001  // >2000us according to specification
+#define CONTROL_HIGH_US 312
+#define CONTROL_1_US    700
+#define CONTROL_0_US    700
 
 byte inputBuffer[5];
 
@@ -36,7 +43,7 @@ void setup() {
 
 void sendPulse(long us) {
   /* Sends 38Khz pulse when using a 16Mhz IC */
-  for (int i = 0; i < (us / 26) - 1; i++) {
+  for (int i = 0; i < (us / 26); i++) {
     digitalWrite(LED, HIGH);
     delayMicroseconds(10);
     digitalWrite(LED, LOW);
@@ -45,18 +52,19 @@ void sendPulse(long us) {
 }
 
 void sendHeader() {
-  sendPulse(2002);
-  delayMicroseconds(1998);
+  sendPulse(HEADER_HIGH_US);
+  delayMicroseconds(HEADER_LOW_US);
 }
 
 void sendFooter() {
-  sendPulse(312);
-  delayMicroseconds(2001);  // >2000ms according to specification
+  sendPulse(FOOTER_HIGH_US);
+  delayMicroseconds(FOOTER_LOW_US);
 }
 
 void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte trim_) {
   const byte mask[] = {1, 2, 4, 8, 16, 32, 64, 128};
-  byte dataPointer = 0, maskPointer = 8;
+  byte dataPointer = 0;
+  byte maskPointer = 8;
   byte data[4];
 
   data[0] = byte(yaw + (int(trim_) - 63) / 3); // trim_ adjusts yaw +/-20
@@ -68,11 +76,11 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
 
   // Send 32-bit command (replace 4 with a 3 for 24-bit version)
   while (dataPointer < 4) {
-    sendPulse(312);
+    sendPulse(CONTROL_HIGH_US);
     if(data[dataPointer] & mask[--maskPointer]) {
-      delayMicroseconds(700); // 1
+      delayMicroseconds(CONTROL_1_US); // 1
     } else {
-      delayMicroseconds(300); // 0
+      delayMicroseconds(CONTROL_0_US); // 0
     }
     if (!maskPointer) {
       maskPointer = 8;
