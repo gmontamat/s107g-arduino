@@ -24,7 +24,7 @@
 #define FOOTER_LOW_US   2001  // >2000us according to specification
 #define CONTROL_HIGH_US 312
 #define CONTROL_1_US    700
-#define CONTROL_0_US    700
+#define CONTROL_0_US    300
 
 byte inputBuffer[5];
 
@@ -43,7 +43,7 @@ void setup() {
 
 void sendPulse(long us) {
   /* Sends 38Khz pulse when using a 16Mhz IC */
-  for (int i = 0; i < (us / 26); i++) {
+  for (int i = 0; i < (us / 26) - 1; i++) {
     digitalWrite(LED, HIGH);
     delayMicroseconds(10);
     digitalWrite(LED, LOW);
