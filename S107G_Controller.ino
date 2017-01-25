@@ -52,11 +52,11 @@ void sendPulse(long us) {
   /* Sends 38KHz pulse to LED pin for 'us' microseconds */
   cli();
   while (us > 0) {
-    digitalWrite(LED, HIGH);  // 3 microseconds approximately
+    digitalWrite(LED, HIGH);  // 3us approximately
     delayMicroseconds(10);
-    digitalWrite(LED, LOW);   // 3 microseconds approximately
+    digitalWrite(LED, LOW);   // 3us approximately
     delayMicroseconds(10);
-    us -= PULSE_PERIOD_US;    // 26 microseconds in total
+    us -= PULSE_PERIOD_US;    // 26us in total
   }
   sei();
 }
@@ -127,9 +127,9 @@ void loop() {
 
   // Wait before sending next command
   if (!inputBuffer[0]) {
-    interval = 120;  // channel A
+    interval = 120;  // channel A (120ms between headers)
   } else {
-    interval = 180;  // channel B
+    interval = 180;  // channel B (180ms between headers)
   }
   while (millis() < millisLast + interval);
   millisLast = millis();
