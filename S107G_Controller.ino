@@ -4,23 +4,10 @@
 
    Emulates the remote control of the S107G with commands passed through
    the serial port, using an array of infrarred LEDs attached to pin 3.
+   For more information refer to https://github.com/gmontamat/s107g-arduino
 
    The circuit:
    * Two/three 940nm IR LEDs and a resistor (see http://led.linear1.org/led.wiz)
-
-   Based on (credit to these people for reverse engineering the controller):
-   * https://github.com/vivin/syma
-   * http://www.jimhung.co.uk/?p=901
-   * http://www.jimhung.co.uk/?p=1241
-   * http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/
-   * https://sites.google.com/site/spirixcode/code/kodek.txt?attredirects=0
-   * https://learn.adafruit.com/ir-sensor/making-an-intervalometer
-
-   IR transmission protocol:
-   * http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt
-
-   For the 3-channel model refer to:
-   * http://abarry.org/s107g-helicopter-control-via-arduino/
 */
 
 #define LED 3
