@@ -15,4 +15,4 @@ The code in this repository is based on the work of several people. Credit to th
 
 ## Information
 
-The protocol to control the RC helicopter can be found [here](http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt). Note that this code works for the 2-channel version, if you have a 3-channel remote controller follow [this link](ttp://abarry.org/s107g-helicopter-control-via-arduino/).
+The protocol to control the RC helicopter can be found [here](http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt). Note that this code works for the 2-channel version, if you have a 3-channel remote controller follow [this link](http://abarry.org/s107g-helicopter-control-via-arduino/).
