@@ -10,7 +10,7 @@ The code in this repository is based on the work of several people. Credit to th
 * http://www.jimhung.co.uk/?p=901
 * http://www.jimhung.co.uk/?p=1241
 * http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/
-* https://sites.google.com/site/spirixcode/code/kodek.txt?attredirects=0
+* https://sites.google.com/site/spirixcode/code/kodek.txt
 * https://learn.adafruit.com/ir-sensor/making-an-intervalometer
 
 ## Information
