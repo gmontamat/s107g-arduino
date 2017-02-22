@@ -10,9 +10,9 @@ about this project refer to: https://github.com/gmontamat/s107g-arduino
 
 import curses
 import Queue
-import threading
-import serial
+import serial  # pip install pyserial
 import struct
+import threading
 
 
 SERIAL_PORT = "/dev/ttyACM0"
@@ -53,18 +53,24 @@ class SerialController(threading.Thread):
     def run(self):
         while True:
             for command in self.get_next_commands():
-                if command == 'y-' and self.yaw < 127:
-                    self.yaw += 1
-                elif command == 'y+' and self.yaw > 0:
-                    self.yaw -= 1
-                elif command == 'p+' and self.pitch < 127:
-                    self.pitch += 1
+                if command == 'y-':
+                    self.yaw += 20
+                    self.yaw = min(self.yaw, 127)
+                elif command == 'y+':
+                    self.yaw -= 20
+                    self.yaw = max(self.yaw, 0)
+                elif command == 'p+':
+                    self.pitch += 20
+                    self.pitch = min(self.pitch, 127)
                 elif command == 'p-' and self.pitch > 0:
-                    self.pitch -= 1
-                elif command == 't+' and self.throttle < 127:
-                    self.throttle += 1
+                    self.pitch -= 20
+                    self.pitch = max(self.pitch, 0)
+                elif command == 't+':
+                    self.throttle += 5
+                    self.throttle = min(self.throttle, 127)
                 elif command == 't-' and self.throttle > 0:
-                    self.throttle -= 1
+                    self.throttle -= 5
+                    self.throttle = max(self.throttle, 0)
                 elif command == 'r-' and self.trim < 127:
                     self.trim += 1
                 elif command == 'r+' and self.trim > 0:
@@ -88,16 +94,21 @@ def control_ui():
 
     # Print instructions
     stdscr.addstr(0, 0, "S107G Remote Controller")
-    stdscr.addstr(2, 0, "a/z:        throttle up/down")
-    stdscr.addstr(3, 0, "Up/Down:    pitch forward/backward")
-    stdscr.addstr(4, 0, "Left/Right: yaw left/right")
-    stdscr.addstr(5, 0, "j/k:        trim left/right")
-    stdscr.addstr(7, 0, "Press 'q' to quit")
+    stdscr.addstr(2, 0, " a     : throttle up")
+    stdscr.addstr(3, 0, " z     : throttle down")
+    stdscr.addstr(4, 0, " Up    : pitch forward")
+    stdscr.addstr(5, 0, " Down  : pitch backward")
+    stdscr.addstr(6, 0, " Left  : yaw left")
+    stdscr.addstr(7, 0, " Right : yaw right")
+    stdscr.addstr(8, 0, " j     : trim left")
+    stdscr.addstr(9, 0, " k     : trim right")
+    stdscr.addstr(11, 0, "Press 'q' to quit")
     stdscr.refresh()
 
     # Start controller
     commands = Queue.Queue()
     controller = SerialController(commands, SERIAL_PORT, SERIAL_BAUD_RATE)
+    controller.daemon = True
     controller.start()
 
     while True:

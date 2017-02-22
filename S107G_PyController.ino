@@ -57,7 +57,7 @@ void sendHeader() {
 
 void sendFooter() {
   sendPulse(FOOTER_HIGH_US);
-  delayMicroseconds(FOOTER_LOW_US);
+  //delayMicroseconds(FOOTER_LOW_US);
 }
 
 void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte trim_) {
@@ -111,6 +111,7 @@ void loop() {
       inputBuffer[i] = Serial.read();
     }
   } else {
+    // No packet received, turn off
     inputBuffer[3] = 0;
   }
 
