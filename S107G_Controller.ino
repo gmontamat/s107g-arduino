@@ -11,14 +11,13 @@
 */
 
 #define LED 3
-#define HEADER_HIGH_US  2002
-#define HEADER_LOW_US   1998
-#define FOOTER_HIGH_US  312
+#define HEADER_HIGH_US  2000
+#define HEADER_LOW_US   2000
+#define FOOTER_HIGH_US  300
 #define FOOTER_LOW_US   2001  // >2000us according to specification
-#define BIT_HIGH_US     312
+#define BIT_HIGH_US     300
 #define BIT_LOW_1_US    700
 #define BIT_LOW_0_US    300
-#define PULSE_PERIOD_US 26
 
 byte inputBuffer[5];
 
@@ -36,16 +35,26 @@ void setup() {
 }
 
 void sendPulse(long us) {
-  /* Sends 38KHz pulse to LED pin for 'us' microseconds */
-  cli();
-  while (us > 0) {
+  /* Sends 38KHz (50% duty cycle) pulse to LED pin for 'us' microseconds */
+  while (us > 26) {
     digitalWrite(LED, HIGH);  // 3us approximately
     delayMicroseconds(10);
     digitalWrite(LED, LOW);   // 3us approximately
     delayMicroseconds(10);
-    us -= PULSE_PERIOD_US;    // 26us in total
+    us -= 26;                 // 26us in total
   }
-  sei();
+  if (us > 19) {
+    // If more than 75% of a period remains, send another pulse
+    digitalWrite(LED, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(LED, LOW);
+    delayMicroseconds(10);
+  } else if (us > 6) {
+    // If between 25% and 75% of a period remains, send half a pulse
+    digitalWrite(LED, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(LED, LOW);
+  }
 }
 
 void sendHeader() {
@@ -69,6 +78,8 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
   data[2] = throttle + channel;
   data[3] = trim_;  // The S107G model ignores the trim byte
 
+  // Begin control packet transmission
+  cli();
   sendHeader();
 
   // Send 32-bit command (replace 4 with a 3 for 24-bit version)
@@ -86,17 +97,19 @@ void sendControlPacket(byte channel, byte yaw, byte pitch, byte throttle, byte t
   }
 
   sendFooter();
+  sei();
+  // Control packet sent
 
   // Print command data in serial monitor
-  Serial.print(" Channel = ");
+  Serial.print(" Channel: ");
   Serial.print(channel, DEC);
-  Serial.print("\tYaw = ");
+  Serial.print("\t Yaw: ");
   Serial.print(data[0], DEC);
-  Serial.print("\tPitch = ");
+  Serial.print("\t Pitch: ");
   Serial.print(data[1], DEC);
-  Serial.print("\tThrottle = ");
+  Serial.print("\t Throttle: ");
   Serial.print(throttle, DEC);
-  Serial.print("\tTrim = ");
+  Serial.print("\t Trim: ");
   Serial.println(data[3], DEC);
 }
 
@@ -138,3 +151,4 @@ void serialEvent() {
     }
   }
 }
+
