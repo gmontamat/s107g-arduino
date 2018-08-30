@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """
 Python virtual remote controller for the Syma S107G helicopter
@@ -10,10 +10,9 @@ about this project refer to: https://github.com/gmontamat/s107g-arduino
 
 import curses
 import Queue
-import serial  # pip install pyserial
+import serial
 import struct
 import threading
-
 
 SERIAL_PORT = "/dev/ttyACM0"
 SERIAL_BAUD_RATE = 9600
@@ -28,7 +27,9 @@ class SerialController(threading.Thread):
         self.connection = serial.Serial(port, baud_rate, timeout=0)
         self.max_commands = max_commands
         self.yaw = 63
+        self.yaw_reset_counter = 0
         self.pitch = 63
+        self.pitch_reset_counter = 0
         self.throttle = 0
         self.trim = 63
 
@@ -40,8 +41,7 @@ class SerialController(threading.Thread):
                 break
 
     def send_data(self):
-        # Wait to receive Arduino's ready signal
-        read_data = self.connection.read(1)
+        read_data = self.connection.read(1)  # Wait to receive Arduino's ready signal
         if read_data:
             read_data = struct.unpack('B', read_data)[0]
         if read_data == READY_ACK:
@@ -52,23 +52,29 @@ class SerialController(threading.Thread):
 
     def run(self):
         while True:
+            self.yaw_reset_counter += 1
+            self.pitch_reset_counter += 1
             for command in self.get_next_commands():
                 if command == 'y-':
-                    self.yaw += 20
+                    self.yaw += 5
                     self.yaw = min(self.yaw, 127)
+                    self.yaw_reset_counter = 0
                 elif command == 'y+':
-                    self.yaw -= 20
+                    self.yaw -= 5
                     self.yaw = max(self.yaw, 0)
+                    self.yaw_reset_counter = 0
                 elif command == 'p+':
-                    self.pitch += 20
+                    self.pitch += 5
                     self.pitch = min(self.pitch, 127)
-                elif command == 'p-' and self.pitch > 0:
-                    self.pitch -= 20
+                    self.pitch_reset_counter = 0
+                elif command == 'p-':
+                    self.pitch -= 5
                     self.pitch = max(self.pitch, 0)
+                    self.pitch_reset_counter = 0
                 elif command == 't+':
                     self.throttle += 5
                     self.throttle = min(self.throttle, 127)
-                elif command == 't-' and self.throttle > 0:
+                elif command == 't-':
                     self.throttle -= 5
                     self.throttle = max(self.throttle, 0)
                 elif command == 'r-' and self.trim < 127:
@@ -77,20 +83,23 @@ class SerialController(threading.Thread):
                     self.trim -= 1
                 elif command == 't0':
                     self.throttle = 0
-                elif command == 'p0':
-                    self.pitch = 63
-                elif command == 'y0':
-                    self.yaw = 63
                 elif command == 'q':
                     return
+            if self.yaw_reset_counter > 10000:
+                self.yaw = 63
+                self.yaw_reset_counter = 0
+            if self.pitch_reset_counter > 10000:
+                self.pitch = 63
+                self.pitch_reset_counter = 0
             self.send_data()
+
 
 def control_ui():
     # Prepare terminal screen
     stdscr = curses.initscr()
-    curses.cbreak() # React to keys instantly
-    curses.noecho() # Turn off automatic echoing of keys to the screen
-    stdscr.keypad(1)    # Enable keypad mode to read arrow keys
+    curses.cbreak()  # React to keys instantly
+    curses.noecho()  # Turn off automatic echoing of keys to the screen
+    stdscr.keypad(1)  # Enable keypad mode to read arrow keys
 
     # Print instructions
     stdscr.addstr(0, 0, "S107G Remote Controller")
@@ -115,6 +124,7 @@ def control_ui():
         c = stdscr.getch()
         if c == ord('q'):
             commands.put('q')
+            controller.join()
             break
         elif c == ord('a'):
             commands.put('t+')
@@ -134,10 +144,6 @@ def control_ui():
             commands.put('r+')
         elif c == ord('x'):
             commands.put('t0')
-        elif c == ord('n'):
-            commands.put('p0')
-        elif c == ord('m'):
-            commands.put('y0')
 
     curses.endwin()
 
