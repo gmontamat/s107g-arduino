@@ -46,6 +46,7 @@ engineering the controller protocol and showing how to send a 38KHz infrarred pu
 
 Some of the sources on which I based my work are:
 
+* [Syma S107G Remote Control Helicopter With An Arduino](https://create.arduino.cc/projecthub/infusion/syma-s107g-remote-control-helicopter-with-an-arduino-0df356)
 * [Syma S107 Arduino Driver and Python GUI Controller](https://github.com/vivin/syma)
 * [jimhung.co.uk's S107G protocol](http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt)
 * [Reverse Engineering the Syma S107G IR Protocol](http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/)
