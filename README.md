@@ -15,14 +15,14 @@ with an Arduino board.
 * Arduino
 
 If you have a different number of LEDs, you may want to use
-[this LED calculator tool](http://www.hebeiltd.com.cn/calculator/v5/led.php). To increase range you will either need more LEDs or
-brighter LEDs, which will draw more current from the Arduino's pin. In such case, consider using a transistor to drive the LEDs'
-power.
+[this LED calculator tool](http://www.hebeiltd.com.cn/calculator/v5/led.php). To increase the range of this circuit, you will
+either need more LEDs or brighter LEDs, which will draw more current from the Arduino's pin. In such case, consider using a
+transistor to drive the LEDs' power.
 
 ## Test
 
-Upload [`S107G_Controller.ino`](./arduino/S107G_Controller.ino) to your Arduino and open your Serial monitor. Turn on your
-helicopter and control the throttle, yaw, pitch, channel, or trim by sending the following commands:
+Upload [`S107G_Controller.ino`](./arduino/S107G_Controller.ino) to your Arduino and open the `Serial Monitor`. Turn on your
+helicopter and control its throttle, yaw, pitch, or trim by sending the following commands:
 
 * `t:X`: set throttle to `X` - any integer between 0 and 127, for example `t:50`
 * `y:X`: set yaw to `X` - any integer between 0 and 127, centered at 63
@@ -31,8 +31,8 @@ helicopter and control the throttle, yaw, pitch, channel, or trim by sending the
 
 ## Run
 
-Upload [S107G_PyController.ino](./arduino/S107G_Controller.ino) to your board and run
-[S107G_PyController.py](./S107G_PyController.py). Control the helicopter with your keyboard.
+Upload [`S107G_PyController.ino`](./arduino/S107G_Controller.ino) to your Arduino and run
+[`S107G_PyController.py`](./S107G_PyController.py) on your computer. Control the helicopter with your keyboard.
 
 ### Known issues
 
@@ -40,16 +40,16 @@ Upload [S107G_PyController.ino](./arduino/S107G_Controller.ino) to your board an
 
 ## References
 
-The code in this repository is based on the work of several people, including [Jim'ung](http://www.jimhung.co.uk/) and
-[Ladyada](https://www.adafruit.com/). Credits to them for reverse engineering the controller protocol and showing how to send a
-38KHz infrarred pulse using Arduino, respectively.
+The code in this repository is based on the work of several people, including that of [Jim'ung](http://www.jimhung.co.uk/),
+[ladyada](https://www.adafruit.com/), and [Kerry D. Wong](http://www.kerrywong.com/). Credits to all of them for reverse
+engineering the controller protocol and showing how to send a 38KHz infrarred pulse using Arduino.
 
 Some of the sources on which I based my work are:
 
 * [Syma S107 Arduino Driver and Python GUI Controller](https://github.com/vivin/syma)
-* [jimhung.co.uk's protocol](http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt)
-* [Reverse Engineering the Syma S107G IR Protocol - Kerry D. Wong](http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/)
-* [Making an Intervalometer by lady ada](https://learn.adafruit.com/ir-sensor/making-an-intervalometer)
+* [jimhung.co.uk's S107G protocol](http://www.jimhung.co.uk/wp-content/uploads/2013/01/Syma107_ProtocolSpec_v1.txt)
+* [Reverse Engineering the Syma S107G IR Protocol](http://www.kerrywong.com/2012/08/27/reverse-engineering-the-syma-s107g-ir-protocol/)
+* [Making an Intervalometer](https://learn.adafruit.com/ir-sensor/making-an-intervalometer)
 
 ## S107G protocol
 
