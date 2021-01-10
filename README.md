@@ -42,7 +42,7 @@ Upload [`S107G_PyController.ino`](./arduino/S107G_Controller.ino) to your Arduin
 
 The code in this repository is based on the work of several people, including that of [Jim'ung](http://www.jimhung.co.uk/),
 [ladyada](https://www.adafruit.com/), and [Kerry D. Wong](http://www.kerrywong.com/). Credits to all of them for reverse
-engineering the controller protocol and showing how to send a 38KHz infrarred pulse using Arduino.
+engineering the controller protocol and showing how to send a 38KHz infrarred pulse using an Arduino.
 
 Some of the sources on which I based my work are:
 
